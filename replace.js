@@ -1,8 +1,19 @@
-var fs = require("fs"),
-    path = require("path"),
-    colors = require("colors"),
-    minimatch = require("minimatch"),
-    sharedOptions = require("./bin/shared-options");
+const fs = require("fs"),
+  path = require("path"),
+  colors = require("colors"),
+  minimatch = require("minimatch"),
+  sharedOptions = require("./bin/shared-options");
+
+function canSearch(file, isFile, includes, excludes) {
+  const inIncludes = includes && includes.some(function (include) {
+      return minimatch(file, include, { matchBase: true });
+  })
+  const inExcludes = excludes.some(function (exclude) {
+      return minimatch(file, exclude, { matchBase: true });
+  })
+
+  return ((!includes || !isFile || inIncludes) && (!excludes || !inExcludes));
+}
 
 module.exports = function(options) {
     // If the path is the same as the default and the recursive option was not
@@ -65,17 +76,6 @@ module.exports = function(options) {
         }
     }
 
-    function canSearch(file, isFile) {
-      var inIncludes = includes && includes.some(function(include) {
-          return minimatch(file, include, { matchBase: true });
-      })
-      var inExcludes = excludes.some(function(exclude) {
-          return minimatch(file, exclude, { matchBase: true });
-      })
-
-      return ((!includes || !isFile || inIncludes) && (!excludes || !inExcludes));
-    }
-
     function replacizeFile(file) {
       fs.lstat(file, function(err, stats) {
           if (err) throw err;
@@ -85,7 +85,7 @@ module.exports = function(options) {
               return;
           }
           var isFile = stats.isFile();
-          if (!canSearch(file, isFile)) {
+          if (!canSearch(file, isFile, includes, excludes)) {
               return;
           }
           if (isFile) {
@@ -124,7 +124,7 @@ module.exports = function(options) {
           return;
       }
       var isFile = stats.isFile();
-      if (!canSearch(file, isFile)) {
+      if (!canSearch(file, isFile, includes, excludes)) {
           return;
       }
       if (isFile) {

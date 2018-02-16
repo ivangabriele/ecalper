@@ -1,134 +1,180 @@
-var fs = require("fs"),
-    test = require('tape'),
-    replace = require('../replace');
+const fs = require("fs"),
+  test = require('tape'),
+  path = require('path'),
+  replace = require('../replace');
 
 function getText(file) {
-  var content = fs.readFileSync(file, "utf-8");
+  const content = fs.readFileSync(file, "utf-8");
   return content;
 }
 
-test('basic', function (t) {
-  t.plan(2);
+function join(file) {
+  return path.join(__dirname, 'test_files', file);
+}
 
-  var file = "./test_files/test_basic.txt";
+function tester(name, testData) {
+  test(name, function (t) {
+    const { file, reps } = testData;
+    t.plan(reps.length);
 
-  replace({
-    regex: "a",
-    replacement: "b",
-    paths:[file]
-  });
+    reps.map(rep => {
+      const {
+        regex,
+        replacement,
+        expected,
+        text,
+        multiline,
+        ignoreCase,
+        preview
+      } = rep;
 
-  var expected = "bbbccc";
-  t.equal(getText(file), expected, "single letter replace works");
+      replace({
+        regex,
+        replacement,
+        paths: [join(file)],
+        multiline,
+        ignoreCase,
+        preview
+      })
+      t.equal(getText(join(file)), expected, text);
+    });
+  })
+}
 
-  replace({
-    regex: "b",
-    replacement: "a",
-    paths:[file]
-  });
+const files = {
+  basic: 'test_basic.txt',
+  multi: 'test_multiline.txt',
+  case: 'test_case.txt',
+  nums: 'test_numbers.txt',
+  prev: 'test_preview.txt'
+}
 
-  var expected = "aaaccc";
-  t.equal(getText(file), expected, "reverting worked");
-});
+const basic = {
+  file: files.basic,
+  reps: [
+    {
+      regex: 'a',
+      replacement: 'b',
+      expected: 'bbbccc',
+      text: 'single letter replace works',
+      multiline: false,
+      ignoreCase: false,
+      preview: false
+    },
+    {
+      regex: 'b',
+      replacement: 'a',
+      expected: 'aaaccc',
+      text: 'reverting worked',
+      multiline: false,
+      ignoreCase: false,
+      preview: false
+    }
+  ]
+}
 
-test('numbers', function(t) {
-  t.plan(2);
+tester('basic', basic);
 
-  var file = "./test_files/test_numbers.txt";
+const numbers = {
+  file: files.nums,
+  reps: [
+    {
+      regex: '123',
+      replacement: '456',
+      expected: 'a456b',
+      text: 'number replace works',
+      multiline: false,
+      ignoreCase: false,
+      preview: false
+    },
+    {
+      regex: '456',
+      replacement: '123',
+      expected: 'a123b',
+      text: 'reverting worked',
+      multiline: false,
+      ignoreCase: false,
+      preview: false
+    }
+  ]
+}
 
-  replace({
-    regex: "123",
-    replacement: "456",
-    paths:[file]
-  });
+tester('numbers', numbers);
 
-  var expected = "a456b";
-  t.equal(getText(file), expected, "number replace works");
+const multiline = {
+  file: files.multi,
+  reps: [
+    {
+      regex: "c$",
+      replacement: "t",
+      expected: "abc\ndef",
+      text: "$ shouldn't match without multiline",
+      multiline: false,
+      ignoreCase: false,
+      preview: false
+    },
+    {
+      regex: 'c$',
+      replacement: 't',
+      expected: 'abt\ndef',
+      text: 'with multiline, $ should match eol',
+      multiline: true,
+      ignoreCase: false,
+      preview: false
+    },
+    {
+      regex: 't$',
+      replacement: 'c',
+      expected: 'abc\ndef',
+      text: 'reverting worked',
+      multiline: true,
+      ignoreCase: false,
+      preview: false
+    }
+  ]
+}
 
-  replace({
-    regex: "456",
-    replacement: "123",
-    paths:[file]
-  });
+tester('multiline', multiline);
 
-  var expected = "a123b";
-  t.equal(getText(file), expected, "reverting worked");
-})
+const caseIn = {
+  file: files.case,
+  reps: [
+    {
+      regex: "a",
+      replacement: "c",
+      expected: "cccc",
+      text: "case insensitive replace",
+      multiline: false,
+      ignoreCase: true,
+      preview: false
+    },
+    {
+      regex: 'c',
+      replacement: 'A',
+      expected: 'AAAA',
+      text: 'reverting worked',
+      multiline: false,
+      ignoreCase: false,
+      preview: false
+    }
+  ]
+}
 
+tester('case insensitive', caseIn);
 
-test('multiline', function(t) {
-  t.plan(3);
+const preview = {
+  file: files.prev,
+  reps: [
+    {
+      regex: "a",
+      replacement: "c",
+      expected: "aaaa",
+      text: "no replacement if 'preview' is true",
+      multiline: false,
+      ignoreCase: false,
+      preview: true
+    }
+  ]
+}
 
-  var file = "./test_files/test_multiline.txt";
-
-  replace({
-    regex: "c$",
-    replacement: "t",
-    paths:[file],
-    multiline: false
-  });
-
-  var expected = "abc\ndef";
-  t.equal(getText(file), expected, "$ shouldn't match without multiline");
-
-  replace({
-    regex: "c$",
-    replacement: "t",
-    paths:[file],
-    multiline: true
-  });
-
-  var expected = "abt\ndef";
-  t.equal(getText(file), expected, "with multiline, $ should match eol");
-
-  replace({
-    regex: "t$",
-    replacement: "c",
-    paths:[file],
-    multiline: true
-  });
-
-  var expected = "abc\ndef";
-  t.equal(getText(file), expected, "reverting worked");
-});
-
-test('case insensitive', function(t) {
-  t.plan(2);
-
-  var file = "./test_files/test_case.txt";
-
-  replace({
-    regex: "a",
-    replacement: "c",
-    paths:[file],
-    ignoreCase: true
-  });
-
-  var expected = "cccc";
-  t.equal(getText(file), expected, "case insensitive replace");
-
-  replace({
-    regex: "c",
-    replacement: "A",
-    paths:[file]
-  });
-
-  var expected = "AAAA";
-  t.equal(getText(file), expected, "reverting worked");
-})
-
-test('preview', function(t) {
-  t.plan(1);
-
-  var file = "./test_files/test_preview.txt";
-
-  replace({
-    regex: "a",
-    replacement: "c",
-    paths:[file],
-    preview: true
-  });
-
-  var expected = "aaaa";
-  t.equal(getText(file), expected, "no replacement if 'preview' is true");
-})
+tester('preview', preview);

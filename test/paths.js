@@ -1,10 +1,15 @@
-var fs = require("fs"),
+const fs = require("fs"),
     test = require('tape'),
+    path = require('path'),
     replace = require('../replace');
 
 function getText(file) {
-  var content = fs.readFileSync(file, "utf-8");
+  const content = fs.readFileSync(file, "utf-8");
   return content;
+}
+
+function join(file) {
+  return path.join(__dirname, file);
 }
 
 test('recursive', function (t) {
@@ -13,33 +18,33 @@ test('recursive', function (t) {
   replace({
     regex: "a",
     replacement: "b",
-    paths: ["test_files/test_paths"],
+    paths: [join("test_files/test_paths")],
     recursive: true
   });
 
-  var changedFiles = [
-    "./test_files/test_paths/test1.txt",
-    "./test_files/test_paths/test2.txt",
-    "./test_files/test_paths/sample1.txt"];
-  var expected = "bbbb";
-  changedFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "recursive replace on directory " + file);
-  })
+  const changedFiles = [
+    "test_files/test_paths/test1.txt",
+    "test_files/test_paths/test2.txt",
+    "test_files/test_paths/sample1.txt"];
+  let expected = "bbbb";
+  changedFiles.map(f =>
+    t.equal(getText(join(f)), expected, "recursive replace on directory " + f)
+  )
 
-  var expected = "aaaa";
-  var ignored = "./test_files/test_paths/test.png"
-  t.equal(getText(ignored), expected, "skip file with match in defaultignore")
+  expected = "aaaa";
+  const ignored = "test_files/test_paths/test.png"
+  t.equal(getText(join(ignored)), expected, "skip file with match in defaultignore")
 
   replace({
     regex: "b",
     replacement: "a",
-    paths: ["test_files/test_paths"],
+    paths: [join("test_files/test_paths")],
     recursive: true
   });
 
-  changedFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "reverting worked");
-  });
+  changedFiles.map(f =>
+    t.equal(getText(join(f)), expected, "reverting worked")
+  );
 });
 
 test('include', function(t) {
@@ -48,39 +53,39 @@ test('include', function(t) {
   replace({
     regex: "a",
     replacement: "b",
-    paths: ["test_files/test_paths"],
+    paths: [join("test_files/test_paths")],
     recursive: true,
     include: "sample*.txt"
   });
 
-  var changedFiles = [
-    "./test_files/test_paths/sample1.txt",
+  const changedFiles = [
+    "test_files/test_paths/sample1.txt",
   ];
-  var expected = "bbbb";
-  changedFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "replace in included file " + file);
-  });
+  let expected = "bbbb";
+  changedFiles.map(f =>
+    t.equal(getText(join(f)), expected, "replace in included file " + f)
+  );
 
-  var ignoredFiles = [
-    "./test_files/test_paths/test1.txt",
-    "./test_files/test_paths/test2.txt",
-    "./test_files/test_paths/test.png"];
-  var expected = "aaaa";
-  ignoredFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "don't replace in not-included file " + file);
-  });
+  const ignoredFiles = [
+    "test_files/test_paths/test1.txt",
+    "test_files/test_paths/test2.txt",
+    "test_files/test_paths/test.png"];
+  expected = "aaaa";
+  ignoredFiles.map(f =>
+    t.equal(getText(join(f)), expected, "don't replace in not-included file " + f)
+  );
 
   replace({
     regex: "b",
     replacement: "a",
-    paths: ["test_files/test_paths"],
+    paths: [join("test_files/test_paths")],
     recursive: true
   });
 
-  var expected = "aaaa";
-  changedFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "reverting worked");
-  });
+  expected = "aaaa";
+  changedFiles.map(f =>
+    t.equal(getText(join(f)), expected, "reverting worked")
+  );
 })
 
 test('exclude', function(t) {
@@ -89,36 +94,36 @@ test('exclude', function(t) {
   replace({
     regex: "a",
     replacement: "b",
-    paths: ["test_files/test_paths"],
+    paths: [join("test_files/test_paths")],
     recursive: true,
     exclude: "*sample*.txt"
   });
 
-  var changedFiles = [
-    "./test_files/test_paths/test1.txt",
-    "./test_files/test_paths/test2.txt"];
-  var expected = "bbbb";
-  changedFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "replace in non-excluded file " + file);
-  });
+  const changedFiles = [
+    "test_files/test_paths/test1.txt",
+    "test_files/test_paths/test2.txt"];
+  let expected = "bbbb";
+  changedFiles.map(f =>
+    t.equal(getText(join(f)), expected, "replace in non-excluded file " + f)
+  );
 
-  var ignoredFiles = [
-    "./test_files/test_paths/sample1.txt",
-    "./test_files/test_paths/test.png"];
-  var expected = "aaaa";
-  ignoredFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "don't replace in excluded file " + file);
-  });
+  const ignoredFiles = [
+    "test_files/test_paths/sample1.txt",
+    "test_files/test_paths/test.png"];
+  expected = "aaaa";
+    ignoredFiles.map(f =>
+    t.equal(getText(join(f)), expected, "don't replace in excluded file " + f)
+  );
 
   replace({
     regex: "b",
     replacement: "a",
-    paths: ["test_files/test_paths"],
+    paths: [join("test_files/test_paths")],
     recursive: true
   });
 
-  var expected = "aaaa";
-  changedFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "reverting worked");
-  });
+  expected = "aaaa";
+  changedFiles.map(f =>
+    t.equal(getText(join(f)), expected, "reverting worked")
+  )
 })

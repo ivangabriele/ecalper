@@ -1,6 +1,5 @@
 const fs = require('fs'),
   path = require('path'),
-  colors = require('colors'),
   minimatch = require('minimatch'),
   sharedOptions = require('./bin/shared-options'),
   Thener = require('thener').default;
@@ -16,127 +15,13 @@ function canSearch(file, isFile, includes, excludes) {
   return ((!includes || !isFile || inIncludes) && (!excludes || !inExcludes));
 }
 
-module.exports = function(options) {
-  // If the path is the same as the default and the recursive option was not
-  // specified, search recursively under the current directory as a
-  // convenience.
-  if (options.paths.length === 1 &&
-    options.paths[0] === sharedOptions.paths.default[0] &&
-    !options.hasOwnProperty('recursive')) {
-    options.paths = ['.'];
-    options.recursive = true;
+function printFile(file, count = false) {
+  let printout = file;
+  if (count) {
+    let count = ' (' + match.length + ')';
+    printout += count;
   }
-
-  let lineCount = 0;
-  const limit = 400; // chars per line
-
-  if (!options.color) options.color = 'cyan';
-
-  let flags = 'g'; // global multiline
-  if (options.ignoreCase) flags += 'i';
-
-  if (options.multiline) flags += 'm';
-
-  let regex;
-  if (options.regex instanceof RegExp) {
-    regex = options.regex;
-  } else {
-    regex = new RegExp(options.regex, flags);
-  }
-  const canReplace = !options.preview && options.replacement !== undefined;
-
-  let includes;
-  if (options.include) includes = options.include.split(',');
-
-  let excludes = [];
-  if (options.exclude) {
-    excludes = options.exclude.split(',');
-  }
-  const ignoreFile = options.excludeList || path.join(__dirname, '/defaultignore');
-  const ignores = fs.readFileSync(ignoreFile, 'utf-8').split('\n');
-  excludes = excludes.concat(ignores);
-
-  var replaceFunc;
-  if (options.funcFile) {
-    eval('replaceFunc = ' + fs.readFileSync(options.funcFile, 'utf-8'));
-  }
-
-  for (let i = 0; i < options.paths.length; i++) {
-    replacizeFile(options.paths[i], !options.async);
-  }
-
-  function replacizeFile(file, sync = true) {
-    lstatPromise(file, sync).then(function (stats) {
-      if (stats.isSymbolicLink()) {
-        // don't follow symbolic links for now
-        return;
-      }
-      var isFile = stats.isFile();
-      if (!canSearch(file, isFile, includes, excludes)) {
-        return;
-      }
-      if (isFile) {
-        readFilePromise(file, sync).then(function (text) {
-          text = replacizeText(text, file);
-          if (canReplace && text !== null) {
-            if(sync) {
-              fs.writeFileSync(file, text);
-            } else {
-              fs.writeFile(file, text, function (err) {
-                if (err) throw err;
-              });
-            }
-          }
-        })
-      }
-      else if (stats.isDirectory() && options.recursive) {
-        readDirPromise(file, sync).then(function(files) {
-          for (var i = 0; i < files.length; i++) {
-            replacizeFile(path.join(file, files[i]), sync);
-          }
-        })
-      }
-    });
-  }
-
-  function replacizeText(text, file) {
-    const match = text.match(regex);
-    if (!match) {
-      return null;
-    }
-
-    if (!options.silent) {
-      let printout = options.noColor ? file : file[options.fileColor] || file;
-      if (options.count) {
-        let count = ' (' + match.length + ')';
-        count = options.noColor ? count : count.grey;
-        printout += count;
-      }
-      console.log(printout);
-    }
-    if (!options.silent && !options.quiet
-       && !(lineCount > options.maxLines)
-       && options.multiline) {
-      const lines = text.split('\n');
-      for (var i = 0; i < lines.length; i++) {
-        let line = lines[i];
-        if (line.match(regex)) {
-          if (++lineCount > options.maxLines) {
-            break;
-          }
-          let replacement = options.replacement || '$&';
-          if (!options.noColor) {
-            replacement = replacement[options.color];
-          }
-          line = line.replace(regex, replaceFunc || replacement);
-          console.log(' ' + (i + 1) + ': ' + line.slice(0, limit));
-        }
-      }
-    }
-    if (canReplace) {
-      return text.replace(regex, replaceFunc || options.replacement);
-    }
-  }
+  console.log(printout);
 }
 
 function readDirPromise(file, sync = true) {
@@ -147,7 +32,6 @@ function readDirPromise(file, sync = true) {
     sync
   );
 }
-
 
 function readFilePromise(file, sync = true) {
   return thenOrPromise(
@@ -180,3 +64,108 @@ function thenOrPromise(arg, func, syncFunc, sync) {
   }
 }
 
+function canReplace(options) {
+  return !options.preview && options.replacement !== undefined;
+}
+
+module.exports = function(options) {
+  // If the path is the same as the default and the recursive option was not
+  // specified, search recursively under the current directory as a
+  // convenience.
+  if (options.paths.length === 1 &&
+    options.paths[0] === sharedOptions.paths.default[0] &&
+    !options.hasOwnProperty('recursive')) {
+    options.paths = ['.'];
+    options.recursive = true;
+  }
+
+  let lineCount = 0;
+
+  let flags = 'g'; // global multiline
+  if (options.ignoreCase) flags += 'i';
+
+  if (options.multiline) flags += 'm';
+
+  if (!(options.regex instanceof RegExp)) {
+    options.regex = new RegExp(options.regex, flags);
+  }
+
+  const ignoreFile = options.excludeList || path.join(__dirname, '/defaultignore');
+  const ignores = fs.readFileSync(ignoreFile, 'utf-8').split('\n');
+  options.excludes = [];
+  if (options.exclude) options.excludes = options.exclude.split(',');
+  options.excludes = options.excludes.concat(ignores);
+
+  if (options.include) options.includes = options.include.split(',');
+
+  let replaceFunc;
+  if (options.funcFile) replaceFunc = require(options.funcFile);
+
+  for (let i = 0; i < options.paths.length; i++) {
+    replacize(options.paths[i], !options.async, options);
+  }
+
+  function replacizeDirectory(file, sync = true, options) {
+    readDirPromise(file, sync).then(function (files) {
+      for (let i = 0; i < files.length; i++) {
+        if (!options.silent) printFile(file, options.count);
+        replacize(path.join(file, files[i]), sync, options);
+      }
+    });
+  }
+
+  function replacize(file, sync = true, options) {
+    lstatPromise(file, sync).then(function (stats) {
+      if (stats.isSymbolicLink()) return;
+      if (stats.isDirectory() && options.recursive) {
+        replacizeDirectory(file, sync, options);
+      }
+
+      let isFile = stats.isFile();
+      if (!canSearch(file, isFile, options.includes, options.excludes)) return;
+      if (isFile) {
+        replacizeFile(file, sync, options);
+      }
+    });
+  }
+
+  function replacizeFile(file, sync = true, options) {
+    readFilePromise(file, sync).then(function (text) {
+      text = replacizeText(text, file, options);
+      if (canReplace(options) && text !== null) {
+        if (sync) {
+          fs.writeFileSync(file, text);
+        } else {
+          fs.writeFile(file, text, function (err) {
+            if (err) throw err;
+          });
+        }
+      }
+    })
+  }
+
+  function replacizeText(text, file, options) {
+    const match = text.match(options.regex);
+    if (!match) {
+      return null;
+    }
+
+    if (!options.silent && !options.quiet
+       && !(lineCount > options.maxLines)
+       && options.multiline) {
+      const lines = text.split('\n');
+      for (let i = 0; i < lines.length; i++) {
+        let line = lines[i];
+        if (line.match(options.regex)) {
+          if (++lineCount > options.maxLines) {
+            break;
+          }
+          let replacement = options.replacement || '$&';
+          line = line.replace(options.regex, replaceFunc || replacement);
+          console.log(' ' + (i + 1) + ': ' + line.slice(0, options.limit || 400));
+        }
+      }
+    }
+    return text.replace(options.regex, replaceFunc || options.replacement);
+  }
+}

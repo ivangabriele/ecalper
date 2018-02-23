@@ -58,25 +58,10 @@ module.exports = {
         flag: true,
         help: "Just print the names of the files matches occured in (faster)"
     },
-    color: {
-        metavar: 'COLOR',
-        help: "highlight color, e.g. 'green' or 'blue'",
-        choices: ['red', 'green', 'blue', 'cyan', 'yellow', 'magenta', 'bold', 'italic'],
-        default: 'cyan'
-    },
-    fileColor: {
-        help: "highlight matching file's name in color, e.g. 'green' or 'blue'",
-        choices: ['red', 'green', 'blue', 'cyan', 'yellow', 'magenta', 'bold', 'italic'],
-        default: 'yellow'
-    },
     async: {
         abbr: 'a',
         flag: true,
         help: "asynchronously read/write files in directory (faster)",
         hidden: true
-    },
-    noColor: {
-      help: 'Disable color output.',
-      flag: true
     }
 };

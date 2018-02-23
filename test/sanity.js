@@ -25,7 +25,8 @@ function tester(name, testData) {
         text,
         multiline,
         ignoreCase,
-        preview
+        preview,
+        async
       } = rep;
 
       replace({
@@ -34,7 +35,8 @@ function tester(name, testData) {
         paths: [join(file)],
         multiline,
         ignoreCase,
-        preview
+        preview,
+        async
       })
       t.equal(getText(join(file)), expected, text);
     });
@@ -59,7 +61,8 @@ const basic = {
       text: 'single letter replace works',
       multiline: false,
       ignoreCase: false,
-      preview: false
+      preview: false,
+      async: false
     },
     {
       regex: 'b',
@@ -68,7 +71,8 @@ const basic = {
       text: 'reverting worked',
       multiline: false,
       ignoreCase: false,
-      preview: false
+      preview: false,
+      async: false
     }
   ]
 }
@@ -85,7 +89,8 @@ const numbers = {
       text: 'number replace works',
       multiline: false,
       ignoreCase: false,
-      preview: false
+      preview: false,
+      async: false
     },
     {
       regex: '456',
@@ -94,7 +99,8 @@ const numbers = {
       text: 'reverting worked',
       multiline: false,
       ignoreCase: false,
-      preview: false
+      preview: false,
+      async: false
     }
   ]
 }
@@ -111,7 +117,8 @@ const multiline = {
       text: "$ shouldn't match without multiline",
       multiline: false,
       ignoreCase: false,
-      preview: false
+      preview: false,
+      async: false
     },
     {
       regex: 'c$',
@@ -120,7 +127,8 @@ const multiline = {
       text: 'with multiline, $ should match eol',
       multiline: true,
       ignoreCase: false,
-      preview: false
+      preview: false,
+      async: false
     },
     {
       regex: 't$',
@@ -129,7 +137,8 @@ const multiline = {
       text: 'reverting worked',
       multiline: true,
       ignoreCase: false,
-      preview: false
+      preview: false,
+      async: false
     }
   ]
 }
@@ -146,7 +155,8 @@ const caseIn = {
       text: "case insensitive replace",
       multiline: false,
       ignoreCase: true,
-      preview: false
+      preview: false,
+      async: false
     },
     {
       regex: 'c',
@@ -155,7 +165,8 @@ const caseIn = {
       text: 'reverting worked',
       multiline: false,
       ignoreCase: false,
-      preview: false
+      preview: false,
+      async: false
     }
   ]
 }
@@ -172,9 +183,28 @@ const preview = {
       text: "no replacement if 'preview' is true",
       multiline: false,
       ignoreCase: false,
-      preview: true
+      preview: true,
+      async: false
     }
   ]
 }
 
 tester('preview', preview);
+
+// const async = {
+//   file: files.prev,
+//   reps: [
+//     {
+//       regex: "a",
+//       replacement: "c",
+//       expected: "aaaa",
+//       text: "no replacement if 'preview' is true",
+//       multiline: true,
+//       ignoreCase: false,
+//       preview: false,
+//       async: true
+//     }
+//   ]
+// }
+
+// tester('async', async);

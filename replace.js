@@ -2,7 +2,8 @@ const fs = require('fs'),
   path = require('path'),
   minimatch = require('minimatch'),
   sharedOptions = require('./bin/shared-options'),
-  Thener = require('thener').default;
+  Thener = require('thener').default,
+  RegReplacer = require("regreplacer").default;
 
 function canSearch(file, isFile, includes, excludes) {
   const inIncludes = includes && includes.some(function (include) {
@@ -145,10 +146,10 @@ module.exports = function(options) {
   }
 
   function replacizeText(text, file, options) {
-    const match = text.match(options.regex);
-    if (!match) {
-      return null;
-    }
+    const regRep = new RegReplacer(options.regex);
+    const regMatches = regRep.match(text);
+
+    if (!regMatches.hasMatches) return null;
 
     if (!options.silent && !options.quiet
        && !(lineCount > options.maxLines)
@@ -166,6 +167,12 @@ module.exports = function(options) {
         }
       }
     }
-    return text.replace(options.regex, replaceFunc || options.replacement);
+    
+    let rep;
+    if(replaceFunc) {
+      return regMatches.replaceAll(replaceFunc, "matches");
+    } else {
+      return regMatches.replaceAll(options.replacement, "matches");
+    }
   }
 }

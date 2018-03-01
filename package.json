@@ -15,6 +15,7 @@
   "dependencies": {
     "minimatch": "^0.2.14",
     "nomnom": "1.6.x",
+    "regreplacer": "^1.1.11",
     "thener": "0.0.1"
   },
   "devDependencies": {

@@ -19,7 +19,8 @@
     "thener": "0.0.1"
   },
   "devDependencies": {
-    "tape": "^0.2.2"
+    "tap": "^11.1.1",
+    "tape": "^4.9.0"
   },
   "bin": {
     "replace": "./bin/replace.js",

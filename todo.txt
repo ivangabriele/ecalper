@@ -1,0 +1,20 @@
+- Switch from nomnom to commander
+
+- Make whichline library to simplify portions of replace
+
+// Replace
+check into readline module and streams for replace
+
+// To learn for replace
+Figure out how to properly promisify fs properties, then incorporate
+that into thenOrPromise.
+Articles:
+https://brunoscopelliti.com/new-util-promisify-in-nodejs/
+http://2ality.com/2017/05/util-promisify.html
+
+
+Learn about Promise.resolve, which seems to replace Thener, see how they compare
+
+Stuff to Read
+https://medium.com/@_lrlna
+https://nodejs.org/api/readline.html

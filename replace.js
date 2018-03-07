@@ -51,6 +51,7 @@ function thenOrPromise(arg, func, syncFunc, sync) {
   if (sync) {
     try {
       const stats = syncFunc(arg);
+      // return Promise.resolve(stats);
       return new Thener(stats);
     } catch (e) {
       console.log(e);
@@ -121,7 +122,7 @@ module.exports = function(options) {
       if (stats.isDirectory() && options.recursive) {
         replacizeDirectory(file, sync, options);
       }
-
+      
       let isFile = stats.isFile();
       if (!canSearch(file, isFile, options.includes, options.excludes)) return;
       if (isFile) {
@@ -133,6 +134,7 @@ module.exports = function(options) {
   function replacizeFile(file, sync = true, options) {
     readFilePromise(file, sync).then(function (text) {
       text = replacizeText(text, file, options);
+      console.log(text === null);
       if (canReplace(options) && text !== null) {
         if (sync) {
           fs.writeFileSync(file, text);

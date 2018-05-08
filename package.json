@@ -2,12 +2,12 @@
   "name": "replace",
   "description": "Command line search and replace utility",
   "license": "MIT",
-  "version": "0.3.0",
-  "author": "Heather Arthur <fayearthur@gmail.com>",
+  "version": "1.0.0",
+  "author": "Alessandro Maclaine <almaclaine@gmail.com>",
   "main": "replace.js",
   "repository": {
     "type": "git",
-    "url": "http://github.com/harthur/replace.git"
+    "url": "https://github.com/ALMaclaine/replace"
   },
   "scripts": {
     "test": "tap test"

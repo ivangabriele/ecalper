@@ -13,6 +13,11 @@ module.exports = {
         describe: "File or directory to search",
         default: ["*"]
     },
+    stdin: {
+        abbr: 'z',
+        boolean: true,
+        describe: 'Use standard in for input'
+    },
     recursive: {
         abbr: 'r',
         boolean: true,

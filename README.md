@@ -1,3 +1,13 @@
+# COMMON ISSUE ON WINDOWS
+There is a built-in replace command on windows, if you get an error like this
+
+```shell
+Invalid switch - -h
+No files replaced
+```
+
+You are using the windows replace
+
 # replace
 `replace` is a command line utility for performing search-and-replace on files. It's similar to sed but there are a few differences:
 

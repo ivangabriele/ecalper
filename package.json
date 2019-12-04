@@ -13,7 +13,7 @@
     "test": "node test"
   },
   "dependencies": {
-    "chalk": "3.0.0",
+    "chalk": "2.4.2",
     "minimatch": "3.0.4",
     "yargs": "15.0.2"
   },

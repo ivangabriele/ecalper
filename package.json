@@ -10,7 +10,7 @@
     "url": "https://github.com/ALMaclaine/replace"
   },
   "scripts": {
-    "test": "tap test"
+    "test": "node test"
   },
   "dependencies": {
     "colors": "1.2.4",

@@ -1,6 +1,6 @@
 var fs = require("fs"),
     path = require("path"),
-    colors = require("colors"),
+    chalk = require("chalk"),
     minimatch = require("minimatch"),
     sharedOptions = require("./bin/shared-options");
 
@@ -167,10 +167,10 @@ module.exports = function(options) {
         }
 
         if (!options.silent && file) {
-            var printout = options.noColor ? file : file[options.fileColor] || file;
+            var printout = options.noColor ? file : options.fileColor ? chalk[options.fileColor](file) : file;
             if (options.count) {
                 var count = " (" + match.length + ")";
-                count = options.noColor ? count : count.grey;
+                count = options.noColor ? count : chalk.grey(count);
                 printout += count;
             }
             console.log(printout);
@@ -187,7 +187,7 @@ module.exports = function(options) {
                     }
                     var replacement = options.replacement || "$&";
                     if (!options.noColor) {
-                      replacement = replacement[options.color];
+                      replacement = chalk[options.color](replacement);
                     }
                     line = line.replace(regex, replaceFunc || replacement);
                     // only console log if file not stdin

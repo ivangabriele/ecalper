@@ -10,15 +10,15 @@
     "url": "https://github.com/ALMaclaine/replace"
   },
   "scripts": {
-    "test": "tap test"
+    "test": "node test"
   },
   "dependencies": {
-    "colors": "1.2.4",
+    "chalk": "2.4.2",
     "minimatch": "3.0.4",
-    "yargs": "12.0.5"
+    "yargs": "15.0.2"
   },
   "devDependencies": {
-    "tape": "4.9.0"
+    "tape": "4.11.0"
   },
   "bin": {
     "replace": "./bin/replace.js",

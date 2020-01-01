@@ -5,6 +5,7 @@ var fs = require("fs"),
     sharedOptions = require("./bin/shared-options");
 
 module.exports = function(options) {
+    var matched = [];
     // If the path is the same as the default and the recursive option was not
     // specified, search recursively under the current directory as a
     // convenience.
@@ -81,6 +82,7 @@ module.exports = function(options) {
         }
     }
 
+    return matched;
 
     function canSearch(file, isFile) {
       var inIncludes = includes && includes.some(function(include) {
@@ -151,6 +153,11 @@ module.exports = function(options) {
           if (canReplace && text !== null) {
               fs.writeFileSync(file, text);
           }
+          
+          matched.push({
+            file,
+            text
+          });
       }
       else if (stats.isDirectory() && options.recursive) {
           var files = fs.readdirSync(file);

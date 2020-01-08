@@ -152,12 +152,9 @@ module.exports = function(options) {
           text = replacizeText(text, file);
           if (canReplace && text !== null) {
               fs.writeFileSync(file, text);
+          } else if (text) {
+              matched.push(text);
           }
-          
-          matched.push({
-            file,
-            text
-          });
       }
       else if (stats.isDirectory() && options.recursive) {
           var files = fs.readdirSync(file);

@@ -42,6 +42,7 @@ module.exports = function(scriptName, addlPosArgs, addlOpts) {
         command += " " + option;
     });
 
+
     return require("yargs")
         .scriptName(scriptName)
         .command(command, "", function(yargs) {

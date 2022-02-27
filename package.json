@@ -12,6 +12,7 @@
     "search": "./bin/search.js"
   },
   "scripts": {
+    "prepare": "husky install",
     "test": "yarn test:lint && yarn test:unit",
     "test:lint": "eslint .",
     "test:unit": "node test"

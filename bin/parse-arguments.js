@@ -1,55 +1,57 @@
-var sharedOptions = require("./shared-options");
+const yargs = require('yargs')
 
-module.exports = function(scriptName, addlPosArgs, addlOpts) {
-    addlPosArgs = addlPosArgs || [];
-    addlOpts = addlOpts || {};
+const sharedOptions = require('./shared-options')
 
-    var posArgs = {};
-    var opts = {};
-    Object.keys(sharedOptions).forEach(function(name) {
-        var option = sharedOptions[name];
-        if (typeof option.position === 'number') {
-            posArgs[name] = option;
-        } else {
-            opts[name] = option;
-        }
-    });
+function parseArguments(scriptName, addlPosArgs, addlOpts) {
+  addlPosArgs = addlPosArgs || []
+  addlOpts = addlOpts || {}
 
-    var options = Object.assign({}, opts, addlOpts);
+  const posArgs = {}
+  const opts = {}
+  Object.keys(sharedOptions).forEach(name => {
+    const option = sharedOptions[name]
+    if (typeof option.position === 'number') {
+      posArgs[name] = option
+    } else {
+      opts[name] = option
+    }
+  })
 
-    var positionalArgs = [];
-    [posArgs, addlPosArgs].forEach(function(posArgs) {
-        Object.keys(posArgs).forEach(function(name) {
-            var posArg = posArgs[name];
-            posArg.name = name;
-            positionalArgs[posArg.position] = posArg;
-        });
-    });
+  const options = { ...opts, ...addlOpts }
 
-    var command = "$0";
-    positionalArgs.forEach(function(positionalArg) {
-        var option = positionalArg.name;
+  const positionalArgs = []
+  ;[posArgs, addlPosArgs].forEach(posArgs => {
+    Object.keys(posArgs).forEach(name => {
+      const posArg = posArgs[name]
+      posArg.name = name
+      positionalArgs[posArg.position] = posArg
+    })
+  })
 
-        if (positionalArg.array) {
-            option += "..";
-        }
-        if (positionalArg.demandOption) {
-            option = "<" + option + ">";
-        } else {
-            option = "[" + option + "]";
-        }
+  let command = '$0'
+  positionalArgs.forEach(positionalArg => {
+    let option = positionalArg.name
 
-        command += " " + option;
-    });
+    if (positionalArg.array) {
+      option += '..'
+    }
+    if (positionalArg.demandOption) {
+      option = `<${option}>`
+    } else {
+      option = `[${option}]`
+    }
 
+    command += ` ${option}`
+  })
 
-    return require("yargs")
-        .scriptName(scriptName)
-        .command(command, "", function(yargs) {
-            positionalArgs.forEach(function(positionalArg) {
-                yargs.positional(positionalArg.name, positionalArg);
-            });
-        })
-        .options(options)
-        .argv;
-};
+  return yargs
+    .scriptName(scriptName)
+    .command(command, '', yargs => {
+      positionalArgs.forEach(positionalArg => {
+        yargs.positional(positionalArg.name, positionalArg)
+      })
+    })
+    .options(options).argv
+}
+
+module.exports = parseArguments

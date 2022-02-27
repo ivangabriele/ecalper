@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
-var parseArguments = require("./parse-arguments"),
-    replace = require("../replace");
+const ecalper = require('../ecalper')
+const parseArguments = require('./parse-arguments')
 
-var options = parseArguments("search");
+const options = parseArguments('search')
 
-replace(options);
+ecalper(options)

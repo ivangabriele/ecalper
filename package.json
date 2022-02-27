@@ -1,19 +1,20 @@
 {
-  "name": "replace",
+  "name": "ecalper",
   "description": "Command line search and replace utility",
   "license": "MIT",
   "version": "1.2.1",
-  "author": "Alessandro Maclaine <almaclaine@gmail.com>",
-  "main": "replace.js",
+  "main": "./ecalper.js",
   "engines": {
-    "node": ">= 6"
+    "node": ">=16"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/ALMaclaine/replace"
+  "bin": {
+    "ecalper": "./bin/ecalper.js",
+    "search": "./bin/search.js"
   },
   "scripts": {
-    "test": "node test"
+    "test": "yarn test:lint && yarn test:unit",
+    "test:lint": "eslint .",
+    "test:unit": "node test"
   },
   "dependencies": {
     "chalk": "2.4.2",
@@ -21,16 +22,50 @@
     "yargs": "^15.3.1"
   },
   "devDependencies": {
+    "@commitlint/cli": "16.1.0",
+    "@commitlint/config-conventional": "16.0.0",
+    "@ivangabriele/commitlint-config": "1.0.5",
+    "@ivangabriele/eslint-config-base": "3.0.1",
+    "@ivangabriele/prettier-config": "3.0.2",
+    "eslint": "7.32.0",
+    "eslint-config-airbnb-base": "15.0.0",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-plugin-import": "2.25.4",
+    "eslint-plugin-jest": "25.7.0",
+    "eslint-plugin-prettier": "4.0.0",
+    "eslint-plugin-sort-destructure-keys": "1.4.0",
+    "eslint-plugin-sort-keys-fix": "1.1.2",
+    "husky": "7.0.4",
+    "prettier": "2.5.1",
     "tape": "4.11.0"
   },
-  "bin": {
-    "replace": "./bin/replace.js",
-    "search": "./bin/search.js"
+  "author": {
+    "email": "almaclaine@gmail.com",
+    "name": "Alessandro Maclaine"
   },
+  "bugs": {
+    "url": "https://github.com/ivangabriele/ecalper/issues"
+  },
+  "contributors": [
+    {
+      "email": "ivan.gabriele@gmail.com",
+      "name": "Ivan Gabriele",
+      "url": "https://www.ivangabriele.com"
+    }
+  ],
+  "homepage": "https://github.com/ivangabriele/ecalper#readme",
   "keywords": [
     "sed",
     "grep",
     "search",
     "replace"
-  ]
+  ],
+  "prettier": "@ivangabriele/prettier-config",
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ivangabriele/ecalper.git"
+  }
 }

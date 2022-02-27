@@ -1,139 +1,140 @@
-var fs = require("fs"),
-    test = require('tape'),
-    replace = require('../replace'),
-    path = require("path");
+const fs = require('fs')
+const path = require('path')
+const test = require('tape')
+
+const ecalper = require('../ecalper')
 
 function getText(file) {
-  var content = fs.readFileSync(file, "utf-8");
-  return content;
+  const content = fs.readFileSync(file, 'utf-8')
+
+  return content
 }
 
 function join(file) {
-  return path.join(__dirname, file);
+  return path.join(__dirname, file)
 }
 
-test('basic', function (t) {
-  t.plan(2);
+test('basic', t => {
+  t.plan(2)
 
-  var file = join("test_files/test_basic.txt");
+  const file = join('test_files/test_basic.txt')
 
-  replace({
-    regex: "a",
-    replacement: "b",
-    paths:[file]
-  });
+  ecalper({
+    paths: [file],
+    regex: 'a',
+    replacement: 'b',
+  })
 
-  var expected = "bbbccc";
-  t.equal(getText(file), expected, "single letter replace works");
+  const expected1 = 'bbbccc'
+  t.equal(getText(file), expected1, 'single letter replace works')
 
-  replace({
-    regex: "b",
-    replacement: "a",
-    paths:[file]
-  });
+  ecalper({
+    paths: [file],
+    regex: 'b',
+    replacement: 'a',
+  })
 
-  var expected = "aaaccc";
-  t.equal(getText(file), expected, "reverting worked");
-});
-
-test('numbers', function(t) {
-  t.plan(2);
-
-  var file = join("test_files/test_numbers.txt");
-
-  replace({
-    regex: "123",
-    replacement: "456",
-    paths:[file]
-  });
-
-  var expected = "a456b";
-  t.equal(getText(file), expected, "number replace works");
-
-  replace({
-    regex: "456",
-    replacement: "123",
-    paths:[file]
-  });
-
-  var expected = "a123b";
-  t.equal(getText(file), expected, "reverting worked");
+  const expected2 = 'aaaccc'
+  t.equal(getText(file), expected2, 'reverting worked')
 })
 
+test('numbers', t => {
+  t.plan(2)
 
-test('multiline', function(t) {
-  t.plan(3);
+  const file = join('test_files/test_numbers.txt')
 
-  var file = join("test_files/test_multiline.txt");
+  ecalper({
+    paths: [file],
+    regex: '123',
+    replacement: '456',
+  })
 
-  replace({
-    regex: "c$",
-    replacement: "t",
-    paths:[file],
-    multiline: false
-  });
+  const expected3 = 'a456b'
+  t.equal(getText(file), expected3, 'number replace works')
 
-  var expected = "abc\ndef";
-  t.equal(getText(file), expected, "$ shouldn't match without multiline");
+  ecalper({
+    paths: [file],
+    regex: '456',
+    replacement: '123',
+  })
 
-  replace({
-    regex: "c$",
-    replacement: "t",
-    paths:[file],
-    multiline: true
-  });
-
-  var expected = "abt\ndef";
-  t.equal(getText(file), expected, "with multiline, $ should match eol");
-
-  replace({
-    regex: "t$",
-    replacement: "c",
-    paths:[file],
-    multiline: true
-  });
-
-  var expected = "abc\ndef";
-  t.equal(getText(file), expected, "reverting worked");
-});
-
-test('case insensitive', function(t) {
-  t.plan(2);
-
-  var file = join("test_files/test_case.txt");
-
-  replace({
-    regex: "a",
-    replacement: "c",
-    paths:[file],
-    ignoreCase: true
-  });
-
-  var expected = "cccc";
-  t.equal(getText(file), expected, "case insensitive replace");
-
-  replace({
-    regex: "c",
-    replacement: "A",
-    paths:[file]
-  });
-
-  var expected = "AAAA";
-  t.equal(getText(file), expected, "reverting worked");
+  const expected4 = 'a123b'
+  t.equal(getText(file), expected4, 'reverting worked')
 })
 
-test('preview', function(t) {
-  t.plan(1);
+test('multiline', t => {
+  t.plan(3)
 
-  var file = join("test_files/test_preview.txt");
+  const file = join('test_files/test_multiline.txt')
 
-  replace({
-    regex: "a",
-    replacement: "c",
-    paths:[file],
-    preview: true
-  });
+  ecalper({
+    multiline: false,
+    paths: [file],
+    regex: 'c$',
+    replacement: 't',
+  })
 
-  var expected = "aaaa";
-  t.equal(getText(file), expected, "no replacement if 'preview' is true");
+  const expected5 = 'abc\ndef'
+  t.equal(getText(file), expected5, "$ shouldn't match without multiline")
+
+  ecalper({
+    multiline: true,
+    paths: [file],
+    regex: 'c$',
+    replacement: 't',
+  })
+
+  const expected6 = 'abt\ndef'
+  t.equal(getText(file), expected6, 'with multiline, $ should match eol')
+
+  ecalper({
+    multiline: true,
+    paths: [file],
+    regex: 't$',
+    replacement: 'c',
+  })
+
+  const expected7 = 'abc\ndef'
+  t.equal(getText(file), expected7, 'reverting worked')
+})
+
+test('case insensitive', t => {
+  t.plan(2)
+
+  const file = join('test_files/test_case.txt')
+
+  ecalper({
+    ignoreCase: true,
+    paths: [file],
+    regex: 'a',
+    replacement: 'c',
+  })
+
+  const expected8 = 'cccc'
+  t.equal(getText(file), expected8, 'case insensitive replace')
+
+  ecalper({
+    paths: [file],
+    regex: 'c',
+    replacement: 'A',
+  })
+
+  const expected9 = 'AAAA'
+  t.equal(getText(file), expected9, 'reverting worked')
+})
+
+test('preview', t => {
+  t.plan(1)
+
+  const file = join('test_files/test_preview.txt')
+
+  ecalper({
+    paths: [file],
+    preview: true,
+    regex: 'a',
+    replacement: 'c',
+  })
+
+  const expected10 = 'aaaa'
+  t.equal(getText(file), expected10, "no replacement if 'preview' is true")
 })

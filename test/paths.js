@@ -1,129 +1,127 @@
-var fs = require("fs"),
-    test = require('tape'),
-    replace = require('../replace'),
-    path = require("path");
+const fs = require('fs')
+const path = require('path')
+const test = require('tape')
+
+const ecalper = require('../ecalper')
 
 function getText(file) {
-  var content = fs.readFileSync(file, "utf-8");
-  return content;
+  const content = fs.readFileSync(file, 'utf-8')
+
+  return content
 }
 
 function join(file) {
-  return path.join(__dirname, file);
+  return path.join(__dirname, file)
 }
 
-test('recursive', function (t) {
-  t.plan(7);
+test('recursive', t => {
+  t.plan(7)
 
-  replace({
-    regex: "a",
-    replacement: "b",
-    paths: [join("test_files/test_paths")],
-    recursive: true
-  });
-
-  var changedFiles = [
-    join("test_files/test_paths/test1.txt"),
-    join("test_files/test_paths/test2.txt"),
-    join("test_files/test_paths/sample1.txt")];
-  var expected = "bbbb";
-  changedFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "recursive replace on directory " + file);
+  ecalper({
+    paths: [join('test_files/test_paths')],
+    recursive: true,
+    regex: 'a',
+    replacement: 'b',
   })
 
-  var expected = "aaaa";
-  var ignored = join("test_files/test_paths/test.png");
-  t.equal(getText(ignored), expected, "skip file with match in defaultignore");
+  const changedFiles = [
+    join('test_files/test_paths/test1.txt'),
+    join('test_files/test_paths/test2.txt'),
+    join('test_files/test_paths/sample1.txt'),
+  ]
+  const expected1 = 'bbbb'
+  changedFiles.forEach(file => {
+    t.equal(getText(file), expected1, `recursive replace on directory ${file}`)
+  })
 
-  replace({
-    regex: "b",
-    replacement: "a",
-    paths: [join("test_files/test_paths")],
-    recursive: true
-  });
+  const expected2 = 'aaaa'
+  const ignored = join('test_files/test_paths/test.png')
+  t.equal(getText(ignored), expected2, 'skip file with match in defaultignore')
 
-  changedFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "reverting worked");
-  });
-});
-
-test('include', function(t) {
-  t.plan(5);
-
-  replace({
-    regex: "a",
-    replacement: "b",
-    paths: [join("test_files/test_paths")],
+  ecalper({
+    paths: [join('test_files/test_paths')],
     recursive: true,
-    include: "sample*.txt"
-  });
+    regex: 'b',
+    replacement: 'a',
+  })
 
-  var changedFiles = [
-    join("test_files/test_paths/sample1.txt"),
-  ];
-  var expected = "bbbb";
-  changedFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "replace in included file " + file);
-  });
-
-  var ignoredFiles = [
-    join("test_files/test_paths/test1.txt"),
-    join("test_files/test_paths/test2.txt"),
-    join("test_files/test_paths/test.png")];
-  var expected = "aaaa";
-  ignoredFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "don't replace in not-included file " + file);
-  });
-
-  replace({
-    regex: "b",
-    replacement: "a",
-    paths: [join("test_files/test_paths")],
-    recursive: true
-  });
-
-  var expected = "aaaa";
-  changedFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "reverting worked");
-  });
+  changedFiles.forEach(file => {
+    t.equal(getText(file), expected2, 'reverting worked')
+  })
 })
 
-test('exclude', function(t) {
-  t.plan(6);
+test('include', t => {
+  t.plan(5)
 
-  replace({
-    regex: "a",
-    replacement: "b",
-    paths: [join("test_files/test_paths")],
+  ecalper({
+    include: 'sample*.txt',
+    paths: [join('test_files/test_paths')],
     recursive: true,
-    exclude: "*sample*.txt"
-  });
+    regex: 'a',
+    replacement: 'b',
+  })
 
-  var changedFiles = [
-    join("test_files/test_paths/test1.txt"),
-    join("test_files/test_paths/test2.txt")];
-  var expected = "bbbb";
-  changedFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "replace in non-excluded file " + file);
-  });
+  const changedFiles = [join('test_files/test_paths/sample1.txt')]
+  const expected3 = 'bbbb'
+  changedFiles.forEach(file => {
+    t.equal(getText(file), expected3, `replace in included file ${file}`)
+  })
 
-  var ignoredFiles = [
-    join("test_files/test_paths/sample1.txt"),
-    join("test_files/test_paths/test.png")];
-  var expected = "aaaa";
-  ignoredFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "don't replace in excluded file " + file);
-  });
+  const ignoredFiles = [
+    join('test_files/test_paths/test1.txt'),
+    join('test_files/test_paths/test2.txt'),
+    join('test_files/test_paths/test.png'),
+  ]
+  const expected4 = 'aaaa'
+  ignoredFiles.forEach(file => {
+    t.equal(getText(file), expected4, `don't replace in not-included file ${file}`)
+  })
 
-  replace({
-    regex: "b",
-    replacement: "a",
-    paths: [join("test_files/test_paths")],
-    recursive: true
-  });
+  ecalper({
+    paths: [join('test_files/test_paths')],
+    recursive: true,
+    regex: 'b',
+    replacement: 'a',
+  })
 
-  var expected = "aaaa";
-  changedFiles.forEach(function(file) {
-    t.equal(getText(file), expected, "reverting worked");
-  });
+  const expected5 = 'aaaa'
+  changedFiles.forEach(file => {
+    t.equal(getText(file), expected5, 'reverting worked')
+  })
+})
+
+test('exclude', t => {
+  t.plan(6)
+
+  ecalper({
+    exclude: '*sample*.txt',
+    paths: [join('test_files/test_paths')],
+    recursive: true,
+    regex: 'a',
+    replacement: 'b',
+  })
+
+  const changedFiles = [join('test_files/test_paths/test1.txt'), join('test_files/test_paths/test2.txt')]
+  const expected = 'bbbb'
+  changedFiles.forEach(file => {
+    t.equal(getText(file), expected, `replace in non-excluded file ${file}`)
+  })
+
+  const ignoredFiles = [join('test_files/test_paths/sample1.txt'), join('test_files/test_paths/test.png')]
+  const expected6 = 'aaaa'
+  ignoredFiles.forEach(file => {
+    t.equal(getText(file), expected6, `don't replace in excluded file ${file}`)
+  })
+
+  ecalper({
+    paths: [join('test_files/test_paths')],
+    recursive: true,
+    regex: 'b',
+    replacement: 'a',
+  })
+
+  const expected7 = 'aaaa'
+  changedFiles.forEach(file => {
+    t.equal(getText(file), expected7, 'reverting worked')
+  })
 })

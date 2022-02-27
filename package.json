@@ -2,7 +2,7 @@
   "name": "ecalper",
   "description": "Command line search and replace utility.",
   "license": "MIT",
-  "version": "1.2.1",
+  "version": "1.0.0",
   "main": "./ecalper.js",
   "engines": {
     "node": ">=16"

@@ -12,9 +12,11 @@
 
 With [node.js](http://nodejs.org/) and [npm](http://github.com/isaacs/npm):
 
- npm install -g ecalper
+```sh
+npm i -g ecalper
+```
 
-You can now use `replace` and `search` from the command line.
+You can now use `ecalper` and `search` from the command line.
 
 ## Examples
 

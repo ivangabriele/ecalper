@@ -28,6 +28,7 @@
     "@ivangabriele/commitlint-config": "1.0.5",
     "@ivangabriele/eslint-config-base": "3.0.1",
     "@ivangabriele/prettier-config": "3.0.2",
+    "@ivangabriele/semantic-release-config-base": "2.0.2",
     "eslint": "7.32.0",
     "eslint-config-airbnb-base": "15.0.0",
     "eslint-config-prettier": "8.3.0",
@@ -64,6 +65,9 @@
   "prettier": "@ivangabriele/prettier-config",
   "publishConfig": {
     "access": "public"
+  },
+  "release": {
+    "extends": "@ivangabriele/semantic-release-config-base"
   },
   "repository": {
     "type": "git",

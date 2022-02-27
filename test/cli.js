@@ -15,7 +15,7 @@ function join(file) {
   return path.join(__dirname, file)
 }
 
-test('quotes parsing', t => {
+test('basic', t => {
   t.plan(1)
 
   const input = join('test_files/test_basic.txt')
@@ -24,7 +24,7 @@ test('quotes parsing', t => {
     fs.writeFileSync(input, original, 'utf-8')
   })
 
-  childProcess.spawnSync(process.execPath, [bin, 'ac', "'single'", input])
+  childProcess.spawnSync(process.execPath, [bin, 'ac', 'DC', input])
 
-  t.equal(getText(input), "aa'single'cc")
+  t.equal(getText(input), 'aaDCcc')
 })
